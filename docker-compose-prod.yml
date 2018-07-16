@@ -78,6 +78,9 @@ services:
       - ./mongo/shoppings:/shoppings
     networks:
       - sparknetwork
+    deploy:
+      placement:
+        constraints: [node.hostname == default]
 
   redis:
     image: redis:alpine
