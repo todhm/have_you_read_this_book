@@ -1,0 +1,27 @@
+{% extends "material_design.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block style %}
+<link href="{{ url_for('static', filename='css/signin.css') }}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+
+<div class="row">
+
+  <div class="col-offset-3 col-md-6">
+    {% from "_formhelpers.html" import render_field %}
+
+    <form method="POST" action="{{ url_for('.signup')}}"  class="form-signin" role="form">
+    <h3>Sign Up</h3>
+      {{ form.hidden_tag() }}
+      {{ render_field(form.username, class='form-control' ) }}
+      {{ render_field(form.email, class='form-control') }}
+      {{ render_field(form.password, class='form-control') }}
+      {{ render_field(form.confirm, class='form-control') }}
+      <button type="submit" class="btn btn-lg btn-primary ">Sign Up</button>
+
+    </form>
+
+  </div>
+
+</div>
+{% endblock %}

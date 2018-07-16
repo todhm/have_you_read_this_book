@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}search results{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{{url_for('static',filename='css/search_result.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='css/index.css')}}">
+{% endblock %}
+
+{% block content%}
+
+{% from "_formhelpers.html" import render_searchbook %}
+{{render_searchbook(form)}}
+{% include '_flashmessages.html' %}
+
+{% if products.items %}
+    {% for product in products.items %}
+    <div class="row">
+        <div class="gcs-results col-md-10">
+            <a href ="{{url_for('shopping_app.find_book',find_value=product.asin)}}">
+                {% if product.title %}
+                <h4 class="gs-title">{{product.title}}</h4>
+                {% else %}
+                <h4 class="gs-title">Untitled</h4>
+                {% endif %}
+                {% if product.description %}
+                <div class="gs-snippet">{{product.description[:400]|markdown}}</div>
+                {% endif %}
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% from '_formhelpers.html' import render_pagination %}
+    {{render_pagination(products)}}
+
+{%else%}
+    <h4> {{error}} </h4>
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock %}

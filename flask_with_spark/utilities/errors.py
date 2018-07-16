@@ -1,0 +1,5 @@
+NO_QUERY_ERROR = "You have to write book name or content"
+NO_RESULT_FOUND = "No esults found"
+REVIEW_ERROR = "You already registered review"
+OVERALL_ERROR = "Give this book rating please"
+COMMENT_ERROR = "Please write the comments"

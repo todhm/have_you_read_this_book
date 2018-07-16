@@ -1,0 +1,9 @@
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="flash-message">
+  <ul class="text-danger">
+    <li>{{ messages[0] }}</li>
+  </ul>
+</div>
+{% endif %}
+{% endwith %}

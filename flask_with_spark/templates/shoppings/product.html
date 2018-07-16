@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }}{% endblock %}
+{% block style%}
+<link rel="stylesheet" href="{{url_for('static',filename='css/product.css')}}">
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-offset-3 col-md-6">
+        {% include '_flashmessages.html' %}
+
+        {% if book.imageUrl %}
+        <img src="{{ book.imageUrl }}" height="300px" class="book-image"/>
+        {% endif %}
+
+        <h3>{{ book.title }}</h3>
+        {% if book.description %}
+        {{ book.description|markdown }}
+        {% endif %}
+        <hr />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-offset-3 col-md-6">
+        {% from "_formhelpers.html" import render_star%}
+        {% from "_formhelpers.html" import render_comment %}
+        <ul>
+            <form method="POST" action="{{url_for('shopping_app.find_book',find_value=book.asin)}}"  role="form" class="form-signin">
+                {{form.hidden_tag()}}
+                {{form.userid}}
+                {{form.username}}
+                {{form.productid}}
+                {{render_star(form.overall)}}
+                {{render_comment(form.review,rows=6,class='form-control')}}
+                <button id='search-button' type='submit'>
+                    <span>Submit</span>
+                </button>
+            </form>
+            {% if reviews %}
+            {% for review in reviews.items%}
+             <li>
+                 <td><input name="input-3" value="{{review.overall}}" class="rating-loading input-3"></td>
+                <div class="l-media">
+                 <div class="l-media__body">
+                    <div class = "comment-user-name">
+                      {{review.username}}
+                   </div>
+                    <div class="vjs-comment-list">
+                       {{review.review|markdown}}
+                    </div>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+            {% endif %}
+        </ul>
+          {% from '_formhelpers.html' import render_pagination %}
+          {{ render_pagination(reviews)}}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block script%}
+<script src="{{ url_for('static', filename='js/product.js') }}"></script>
+{% endblock %}

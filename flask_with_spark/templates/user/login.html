@@ -1,0 +1,72 @@
+{% extends "material_design.html" %}
+
+{% block title %}User Login{% endblock %}
+{% block style %}
+<link href="{{ url_for('static', filename='css/signin.css') }}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+
+
+    {% from "_formhelpers.html" import render_field %}
+    <form method="POST" action="{{ url_for('user_app.login')}}" role="form" class="form-signin">
+        <h3>User Login</h3>
+
+        {% if error %}
+        <div class="error text-danger">{{ error }}</div>
+        {% endif %}
+      {{ form.hidden_tag() }}
+
+      {{ render_field(form.email, class='form-control') }}
+      {{ render_field(form.password, class='form-control') }}
+
+      <button type="submit" class="btn btn-lg btn-primary btn-block">Login</button>
+      <a href="{{url_for('user_app.signup')}}" id="signup" class="btn btn-lg btn-primary btn-block">Sign Up</a>
+    </form>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    var state = "{{STATE}}";
+    var urlajax = '/gconnect?state=' + state;
+    $("#signinButton div button").addClass("btn-block")
+
+    function signInCallback(authResult) {
+      if (authResult['code']) {
+        // Hide the sign-in button now that the user is authorized
+        $('#signinButton').attr('style', 'display: none');
+        // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+        $.ajax({
+          type: 'POST',
+          url: urlajax,
+          processData: false,
+          data: authResult['code'],
+          contentType: 'application/octet-stream; charset=utf-8',
+          success: function(result) {
+            // Handle or verify the server response if necessary.
+            if (result) {
+            $('#result').html('Login Successful! Redirecting...');
+                    setTimeout(function() {
+                      window.location.href = "/index";
+                    }, 4000);
+            } else if (authResult['error']) {
+              console.log('There was an error: ' + authResult['error']);
+            } else {
+            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+             }
+          },
+      error: function(result) {
+        console.log('There was an error: ' + result);
+        $("#result").html(result.responseText)
+        setTimeout(function() {
+          window.location.href = "/login";
+        }, 4000);
+        }
+
+        });
+     }}
+
+</script>
+<!--FACEBOOK SIGN IN -->
+<!--<script src="{{url_for('static',filename='js/login.js')}}"></script>-->
+{% endblock %}

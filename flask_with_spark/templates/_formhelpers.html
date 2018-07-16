@@ -1,0 +1,87 @@
+{% macro render_field(field) %}
+<div class="form-group">
+  {{ field.label}}
+  {{ field(**kwargs)|safe }}
+  {% if field.errors %}
+    <ul class="text-danger">
+    {% for error in field.errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+{% endmacro %}
+
+
+{% macro render_star(field) %}
+<div class="form-group">
+  <input id={{field.name}} name={{field.name}} value={{field.data}} class="rating-loading star_rating">
+  {% if field.errors %}
+    <ul class="text-danger">
+    {% for error in field.errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro render_comment(field)%}
+<div class="form-group">
+    <div class="l-media">
+        <div class="l-media__body">
+            <div class="vjs-comment-list">
+                {{ field(**kwargs)|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+{% if field.errors %}
+  <ul class="text-danger">
+  {% for error in field.errors %}
+    <li>{{ error }}</li>
+  {% endfor %}
+  </ul>
+{% endif %}
+{% endmacro %}
+
+
+{% macro render_searchbook(form,search_query="")%}
+<div class="row">
+    <div class="col-md-10" >
+        <div id='search-box' class="ui-widget">
+            <form  id='search-form' method='post' action="{{url_for('shopping_app.search_book_lst')}}">
+                <input id="{{form.search_query.name}}" name="{{form.search_query.name}}" class="form-control" value="{{search_query}}"  placeholder='Search' type='text'/>
+                {{form.hidden_tag()}}
+              <button id='search-button' type='submit'>
+                          <span>Search</span>
+                      </button>
+                  </form>
+              </div>
+          </div>
+      </div>
+{% endmacro %}
+
+{% macro render_pagination(products)%}
+    {% set view_args = request.view_args %}
+    {% do view_args.pop('page') %}
+    <div class="row pagination-div">
+        <div class="col-md-10">
+            <ul class="pagination">
+                <li class="previous">{% if products.has_prev %}<a href="{{url_for(request.endpoint, page=products.prev_num, **view_args)}}">&lt;&lt; Prev</a>{% else %}<a href="#">&lt;&lt;Prev{% endif %}</a></li>
+                 {%- for page in products.iter_pages(right_current=9,right_edge=3,left_edge=3,left_current=0) %}
+                   {% if page %}
+                     {% if page != products.page %}
+                       <li class="page-item"><a class="page-link" href="{{ url_for(request.endpoint,page=page, **view_args) }}">{{ page }}</a></li>
+                     {% else %}
+                       <li class="active"><a>{{ page }}</a></li>
+                     {% endif %}
+                   {% else %}
+                      <li class="disabled"></li>
+                   {% endif %}
+                 {%- endfor %}
+                 <li class="next">{% if products.has_next %}<a href="{{url_for(request.endpoint,page=products.next_num,**view_args)}}">Next &gt;&gt;</a>{% else %}<a href="#">Next &gt;&gt;</a>{% endif %}</li>
+            </ul>
+        </div>
+    </div>
+{% endmacro %}
