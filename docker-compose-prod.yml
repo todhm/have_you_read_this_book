@@ -75,9 +75,7 @@ services:
     restart: always
     volumes:
       - db-data:/data/db
-          volumes:
-            - db-data:/data/db
-            - ./mongo/shoppings:/shoppings
+      - ./mongo/shoppings:/shoppings
     networks:
       - sparknetwork
 
