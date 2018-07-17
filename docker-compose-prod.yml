@@ -7,6 +7,8 @@ services:
     command: gunicorn -b 0.0.0.0:8000 --reload -w 4  wsgi:app
     networks:
         - sparknetwork
+    ports:
+      - "8000:8000"
     deploy:
       placement:
         constraints: [node.hostname == default]
