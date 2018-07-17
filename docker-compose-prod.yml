@@ -72,62 +72,98 @@ services:
 
   mongo:
     image: mongo:3.4
-    command: mongod --smallfiles --replSet rs1 --noauth --oplogSize 3
-    environment:
-      TERM: xterm
+    command: mongos --port 27017 --configdb configserver/config01:27017,config02:27017,config03:27017
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - mongo-data-1:/data/db
+      - ./mongo/scripts/init-router.js:/scripts/init-router.js
       - ./mongo/shoppings:/shoppings
-      - mongo-config-1:/data/configdb
+      - ./mongo/scripts/router.sh:/docker-entrypoint-initdb.d/router.sh
     networks:
       - sparknetwork
     deploy:
       replicas: 1
       placement:
         constraints:
-          - node.labels.mongo.replica == 1
           - node.hostname == default
-
-  mongo2:
+    depends_on:
+      - config01
+      - config02
+      - config03
+      - shard01a
+      - shard01b
+      - shard02a
+      - shard02b
+      - shard03a
+      - shard03b
+## Config Servers
+  config01:
     image: mongo:3.4
-    command: mongod --smallfiles --replSet rs1 --noauth --oplogSize 3
-    environment:
-      TERM: xterm
+    command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
     volumes:
-      - /etc/localtime:/etc/localtime:ro
+      - ./mongo/scripts/init-configserver.js:/scripts/init-configserver.js
+      - mongo-config-1:/data/db
+      - ./mongo/scripts/configserver.sh:/docker-entrypoint-initdb.d/configserver.sh
+
+
+  config02:
+    image: mongo:3.4
+    command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
+    volumes:
+      - ./mongo/scripts:/scripts
+      - mongo-config-2:/data/db
+
+  config03:
+    image: mongo:3.4
+    command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
+    volumes:
+      - ./mongo/scripts:/scripts
+      - mongo-config-3:/data/db
+
+  ## Shards
+  shard01a:
+    image: mongo:3.4
+    command: mongod --port 27018 --shardsvr --replSet shard01 --noprealloc --smallfiles --oplogSize 16
+    volumes:
+      - ./mongo/scripts/init-shard01.js:/scripts/init-shard01.js
+      - mongo-data-1:/data/db
+      - ./mongo/scripts/shard01.sh:/docker-entrypoint-initdb.d/shard01.sh
+
+  shard01b:
+    image: mongo:3.4
+    command: mongod --port 27018 --shardsvr --replSet shard01 --noprealloc --smallfiles --oplogSize 16
+    volumes:
+      - mongo-data-1:/data/db
+  shard02a:
+    image: mongo:3.4
+    command: mongod --port 27019 --shardsvr --replSet shard02 --noprealloc --smallfiles --oplogSize 16
+    volumes:
+      - ./mongo/scripts/init-shard02.js:/scripts/init-shard02.js
       - mongo-data-2:/data/db
-      - mongo-config-2:/data/configdb
-    networks:
-      - sparknetwork
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.mongo.replica == 2
+      - ./mongo/scripts/shard02.sh:/docker-entrypoint-initdb.d/shard02.sh
 
-  mongo3:
+  shard02b:
     image: mongo:3.4
-    command: mongod --smallfiles --replSet rs1 --noauth --oplogSize 3
-    environment:
-      TERM: xterm
+    command: mongod --port 27019 --shardsvr --replSet shard02 --noprealloc --smallfiles --oplogSize 16
     volumes:
-      - /etc/localtime:/etc/localtime:ro
+      - mongo-data-2:/data/db
+
+  shard03a:
+    image: mongo:3.4
+    command: mongod --port 27020 --shardsvr --replSet shard03 --noprealloc --smallfiles --oplogSize 16
+    volumes:
+      - ./mongo/scripts/init-shard03.js:/scripts/init-shard03.js
       - mongo-data-3:/data/db
-      - mongo-config-3:/data/configdb
-    networks:
-      - sparknetwork
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.mongo.replica == 3
+      - ./mongo/scripts/shard03.sh:/docker-entrypoint-initdb.d/shard03.sh
+
+  shard03b:
+    image: mongo:3.4
+    command: mongod --port 27020 --shardsvr --replSet shard03 --noprealloc --smallfiles --oplogSize 16
+    volumes:
+      - mongo-data-3:/data/db
 
   redis:
     image: redis:alpine
     networks:
         - sparknetwork
-
 
   spark-master:
     image: bde2020/spark-master:2.3.0-hadoop2.7
