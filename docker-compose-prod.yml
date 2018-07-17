@@ -74,7 +74,7 @@ services:
     image: mongo:3.4
     command: mongos --port 27017 --configdb configserver/config01:27017,config02:27017,config03:27017
     volumes:
-      - ./mongo/scripts/init-router.js:/scripts/init-router.js
+      - ~/have_you_read_this_book/mongo/scripts:/scripts
       - ./mongo/shoppings:/shoppings
       - ./mongo/scripts/router.sh:/docker-entrypoint-initdb.d/router.sh
     networks:
@@ -99,7 +99,7 @@ services:
     image: mongo:3.4
     command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
     volumes:
-      - ./mongo/scripts/init-configserver.js:/scripts/init-configserver.js
+      - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-config-1:/data/db
       - ./mongo/scripts/configserver.sh:/docker-entrypoint-initdb.d/configserver.sh
 
@@ -108,14 +108,14 @@ services:
     image: mongo:3.4
     command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
     volumes:
-      - ./mongo/scripts:/scripts
+      - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-config-2:/data/db
 
   config03:
     image: mongo:3.4
     command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
     volumes:
-      - ./mongo/scripts:/scripts
+      - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-config-3:/data/db
 
   ## Shards
@@ -123,7 +123,7 @@ services:
     image: mongo:3.4
     command: mongod --port 27018 --shardsvr --replSet shard01 --noprealloc --smallfiles --oplogSize 16
     volumes:
-      - ./mongo/scripts/init-shard01.js:/scripts/init-shard01.js
+      - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-data-1:/data/db
       - ./mongo/scripts/shard01.sh:/docker-entrypoint-initdb.d/shard01.sh
 
@@ -136,7 +136,7 @@ services:
     image: mongo:3.4
     command: mongod --port 27019 --shardsvr --replSet shard02 --noprealloc --smallfiles --oplogSize 16
     volumes:
-      - ./mongo/scripts/init-shard02.js:/scripts/init-shard02.js
+      - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-data-2:/data/db
       - ./mongo/scripts/shard02.sh:/docker-entrypoint-initdb.d/shard02.sh
 
@@ -150,7 +150,7 @@ services:
     image: mongo:3.4
     command: mongod --port 27020 --shardsvr --replSet shard03 --noprealloc --smallfiles --oplogSize 16
     volumes:
-      - ./mongo/scripts/init-shard03.js:/scripts/init-shard03.js
+      - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-data-3:/data/db
       - ./mongo/scripts/shard03.sh:/docker-entrypoint-initdb.d/shard03.sh
 
