@@ -76,7 +76,7 @@ services:
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - ./mongo/shoppings:/shoppings
-      - ./mongo/scripts/router.sh:/docker-entrypoint-initdb.d/router.sh
+      - ~/have_you_read_this_book/mongo/scripts/router.sh:/docker-entrypoint-initdb.d/router.sh
     networks:
       - sparknetwork
     deploy:
@@ -101,7 +101,7 @@ services:
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-config-1:/data/db
-      - ./mongo/scripts/configserver.sh:/docker-entrypoint-initdb.d/configserver.sh
+      - ~/have_you_read_this_book/mongo/scripts/configserver.sh:/docker-entrypoint-initdb.d/configserver.sh
 
 
   config02:
@@ -125,7 +125,7 @@ services:
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-data-1:/data/db
-      - ./mongo/scripts/shard01.sh:/docker-entrypoint-initdb.d/shard01.sh
+      - ~/have_you_read_this_book/mongo/scripts/shard01.sh:/docker-entrypoint-initdb.d/shard01.sh
 
   shard01b:
     image: mongo:3.4
@@ -138,7 +138,7 @@ services:
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-data-2:/data/db
-      - ./mongo/scripts/shard02.sh:/docker-entrypoint-initdb.d/shard02.sh
+      - ~/have_you_read_this_book/mongo/scripts/shard02.sh:/docker-entrypoint-initdb.d/shard02.sh
 
   shard02b:
     image: mongo:3.4
@@ -152,7 +152,7 @@ services:
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-data-3:/data/db
-      - ./mongo/scripts/shard03.sh:/docker-entrypoint-initdb.d/shard03.sh
+      - ~/have_you_read_this_book/mongo/scripts/shard03.sh:/docker-entrypoint-initdb.d/shard03.sh
 
   shard03b:
     image: mongo:3.4
