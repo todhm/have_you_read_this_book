@@ -73,6 +73,8 @@ services:
   mongo:
     image: mongo:3.4
     command: mongos --port 27017 --configdb configserver/config01:27017,config02:27017,config03:27017
+    ports:
+      - "27017:27017"
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - ./mongo/shoppings:/shoppings
