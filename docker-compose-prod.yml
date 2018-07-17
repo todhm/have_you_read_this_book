@@ -102,6 +102,8 @@ services:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-config-1:/data/db
       - ~/have_you_read_this_book/mongo/scripts/configserver.sh:/docker-entrypoint-initdb.d/configserver.sh
+    networks:
+        - sparknetwork
 
 
   config02:
@@ -110,6 +112,8 @@ services:
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-config-2:/data/db
+    networks:
+        - sparknetwork
 
   config03:
     image: mongo:3.4
@@ -117,6 +121,8 @@ services:
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-config-3:/data/db
+    networks:
+        - sparknetwork
 
   ## Shards
   shard01a:
@@ -126,12 +132,18 @@ services:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-data-1:/data/db
       - ~/have_you_read_this_book/mongo/scripts/shard01.sh:/docker-entrypoint-initdb.d/shard01.sh
+    networks:
+        - sparknetwork
+
 
   shard01b:
     image: mongo:3.4
     command: mongod --port 27018 --shardsvr --replSet shard01 --noprealloc --smallfiles --oplogSize 16
     volumes:
       - mongo-data-1:/data/db
+    networks:
+        - sparknetwork
+
   shard02a:
     image: mongo:3.4
     command: mongod --port 27019 --shardsvr --replSet shard02 --noprealloc --smallfiles --oplogSize 16
@@ -139,12 +151,18 @@ services:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-data-2:/data/db
       - ~/have_you_read_this_book/mongo/scripts/shard02.sh:/docker-entrypoint-initdb.d/shard02.sh
+    networks:
+        - sparknetwork
+
 
   shard02b:
     image: mongo:3.4
     command: mongod --port 27019 --shardsvr --replSet shard02 --noprealloc --smallfiles --oplogSize 16
     volumes:
       - mongo-data-2:/data/db
+    networks:
+        - sparknetwork
+
 
   shard03a:
     image: mongo:3.4
@@ -153,12 +171,18 @@ services:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-data-3:/data/db
       - ~/have_you_read_this_book/mongo/scripts/shard03.sh:/docker-entrypoint-initdb.d/shard03.sh
+    networks:
+        - sparknetwork
+
 
   shard03b:
     image: mongo:3.4
     command: mongod --port 27020 --shardsvr --replSet shard03 --noprealloc --smallfiles --oplogSize 16
     volumes:
       - mongo-data-3:/data/db
+    networks:
+        - sparknetwork
+
 
   redis:
     image: redis:alpine
