@@ -72,15 +72,56 @@ services:
 
   mongo:
     image: mongo:3.4
-    restart: always
+    command: mongod --smallfiles --replSet rs1 --noauth --oplogSize 3
+    environment:
+      TERM: xterm
     volumes:
-      - db-data:/data/db
+      - /etc/localtime:/etc/localtime:ro
+      - mongo-data-1:/data/db
       - ./mongo/shoppings:/shoppings
+      - mongo-config-1:/data/configdb
     networks:
       - sparknetwork
     deploy:
+      replicas: 1
       placement:
-        constraints: [node.hostname == default]
+        constraints:
+          - node.labels.mongo.replica == 1
+          - node.hostname == default
+
+  mongo2:
+    image: mongo:3.4
+    command: mongod --smallfiles --replSet rs1 --noauth --oplogSize 3
+    environment:
+      TERM: xterm
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - mongo-data-2:/data/db
+      - mongo-config-2:/data/configdb
+    networks:
+      - sparknetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.mongo.replica == 2
+
+  mongo3:
+    image: mongo:3.4
+    command: mongod --smallfiles --replSet rs1 --noauth --oplogSize 3
+    environment:
+      TERM: xterm
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - mongo-data-3:/data/db
+      - mongo-config-3:/data/configdb
+    networks:
+      - sparknetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.mongo.replica == 3
 
   redis:
     image: redis:alpine
@@ -134,7 +175,12 @@ services:
 
 
 volumes:
-  db-data:
+  mongo-data-1:
+  mongo-data-2:
+  mongo-data-3:
+  mongo-config-1:
+  mongo-config-2:
+  mongo-config-3:
 
 networks:
     sparknetwork:
