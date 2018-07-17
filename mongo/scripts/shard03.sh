@@ -1,2 +1,2 @@
 #!/bin/bash
-mongo --port 27019 < /scripts/init-shard03.js
+mongo --port 27020 < /scripts/init-shard03.js
