@@ -72,144 +72,104 @@ services:
      - PYSPARK_PYTHON=python3
      - APP_SETTINGS=settings.ProductionConfig
 
-  mongo:
+
+  data1:
     image: mongo:3.4
-    command: mongos --port 27017 --configdb configserver/config01:27017,config02:27017,config03:27017
-    ports:
-      - 27017:27017
+    container_name: data1
+    command: mongod --shardsvr --replSet datars --smallfiles --port 27017
     expose:
-      - "27017"
+      - 27017
     volumes:
-      - ~/have_you_read_this_book/mongo/scripts:/scripts
-      - ./mongo/shoppings:/shoppings
-      - ~/have_you_read_this_book/mongo/scripts/router.sh:/docker-entrypoint-initdb.d/router.sh
+      - data:/data/db
+    networks:
+      - sparknetwork
+
+  data2:
+    image: mongo:3.4
+    container_name: data2
+    command: mongod --shardsvr --replSet datars --smallfiles --port 27017
+    expose:
+      - 27017
+    volumes:
+      - data:/data/db
+    networks:
+      - sparknetwork
+
+  data3:
+    image: mongo:3.4
+    container_name: data3
+    command: mongod --shardsvr --replSet datars --smallfiles --port 27017
+    expose:
+      - 27017
+    volumes:
+      - data:/data/db
+    networks:
+      - sparknetwork
+
+  cfg1:
+    image: mongo:3.4
+    container_name: cfg1
+    command: mongod --configsvr --replSet cfgrs --smallfiles --port 27017
+    expose:
+      - 27017
+    volumes:
+      - cfg:/data/configdb
+    networks:
+      - sparknetwork
+
+  cfg2:
+    image: mongo:3.4
+    container_name: cfg2
+    command: mongod --configsvr --replSet cfgrs --smallfiles --port 27017
+    expose:
+      - 27017
+    volumes:
+      - cfg:/data/configdb
+    networks:
+      - sparknetwork
+
+  cfg3:
+    image: mongo:3.4
+    container_name: cfg3
+    command: mongod --configsvr --replSet cfgrs --smallfiles --port 27017
+    expose:
+      - 27017
+    volumes:
+      - cfg:/data/configdb
+    networks:
+      - sparknetwork
+
+  mongos1:
+    image: mongo:3.4
+    container_name: mongos1
+    command: mongos --configdb cfgrs/cfg1:27017,cfg2:27017,cfg3:27017
+    expose:
+      - 27017
     networks:
       - sparknetwork
     deploy:
-      replicas: 1
       placement:
-        constraints:
-          - node.hostname == default
-    depends_on:
-      - config01
-      - config02
-      - config03
-      - shard01a
-      - shard01b
-      - shard02a
-      - shard02b
-      - shard03a
-      - shard03b
-## Config Servers
-  config01:
-    image: mongo:3.4
-    command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
-    volumes:
-      - ~/have_you_read_this_book/mongo/scripts:/scripts
-      - mongo-config-1:/data/db
-      - ~/have_you_read_this_book/mongo/scripts/configserver.sh:/docker-entrypoint-initdb.d/configserver.sh
-    networks:
-        - sparknetwork
-    depends_on:
-      - config02
-      - config03
+        constraints: [node.hostname == default]
 
-  config02:
-    image: mongo:3.4
-    command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
-    volumes:
-      - ~/have_you_read_this_book/mongo/scripts:/scripts
-      - mongo-config-2:/data/db
-    networks:
-        - sparknetwork
 
-  config03:
+  mongos2:
     image: mongo:3.4
-    command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
-    volumes:
-      - ~/have_you_read_this_book/mongo/scripts:/scripts
-      - mongo-config-3:/data/db
-    networks:
-        - sparknetwork
-
-  ## Shards
-  shard01a:
-    image: mongo:3.4
-    command: mongod --port 27018 --shardsvr --replSet shard01 --noprealloc --smallfiles --oplogSize 16
-    ports:
-      - 27018:27017
+    container_name: mongos2
+    command: mongos --configdb cfgrs/cfg1:27017,cfg2:27017,cfg3:27017
     expose:
-      - "27017"
-    volumes:
-      - ~/have_you_read_this_book/mongo/scripts:/scripts
-      - mongo-data-1:/data/db
-      - ~/have_you_read_this_book/mongo/scripts/shard01.sh:/docker-entrypoint-initdb.d/shard01.sh
+      - 27017
     networks:
-        - sparknetwork
-    depends_on:
-      - config01
-      - config02
-      - config03
+      - sparknetwork
 
-  shard01b:
-    image: mongo:3.4
-    command: mongod --port 27018 --shardsvr --replSet shard01 --noprealloc --smallfiles --oplogSize 16
-    volumes:
-      - mongo-data-1:/data/db
+  bootstrap:
+    image: stefanprodan/mongo-bootstrap:latest
+    container_name: mongo-bootstrap
+    command:
+      - '-dataSet=datars/data1:27017,data2:27017,data3:27017'
+      - '-configSet=cfgrs/cfg1:27017,cfg2:27017,cfg3:27017'
+      - '-mongos=mongos1:27017,mongos2:27017'
     networks:
-        - sparknetwork
-
-  shard02a:
-    image: mongo:3.4
-    command: mongod --port 27019 --shardsvr --replSet shard02 --noprealloc --smallfiles --oplogSize 16
-    ports:
-      - 27019:27017
-    volumes:
-      - ~/have_you_read_this_book/mongo/scripts:/scripts
-      - mongo-data-2:/data/db
-      - ~/have_you_read_this_book/mongo/scripts/shard02.sh:/docker-entrypoint-initdb.d/shard02.sh
-    networks:
-        - sparknetwork
-    depends_on:
-      - config01
-      - config02
-      - config03
-
-
-  shard02b:
-    image: mongo:3.4
-    command: mongod --port 27019 --shardsvr --replSet shard02 --noprealloc --smallfiles --oplogSize 16
-    volumes:
-      - mongo-data-2:/data/db
-    networks:
-        - sparknetwork
-
-
-  shard03a:
-    image: mongo:3.4
-    command: mongod --port 27020 --shardsvr --replSet shard03 --noprealloc --smallfiles --oplogSize 16
-    ports:
-      - 27020:27017
-    volumes:
-      - ~/have_you_read_this_book/mongo/scripts:/scripts
-      - mongo-data-3:/data/db
-      - ~/have_you_read_this_book/mongo/scripts/shard03.sh:/docker-entrypoint-initdb.d/shard03.sh
-    networks:
-        - sparknetwork
-    depends_on:
-      - config01
-      - config02
-      - config03
-
-
-  shard03b:
-    image: mongo:3.4
-    command: mongod --port 27020 --shardsvr --replSet shard03 --noprealloc --smallfiles --oplogSize 16
-    volumes:
-      - mongo-data-3:/data/db
-    networks:
-        - sparknetwork
-
+      - sparknetwork
 
   redis:
     image: redis:alpine
@@ -262,12 +222,10 @@ services:
 
 
 volumes:
-  mongo-data-1:
-  mongo-data-2:
-  mongo-data-3:
-  mongo-config-1:
-  mongo-config-2:
-  mongo-config-3:
+    data: {}
+    cfg: {}
+
 
 networks:
     sparknetwork:
+      external: true

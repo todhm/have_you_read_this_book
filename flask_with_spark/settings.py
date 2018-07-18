@@ -40,7 +40,7 @@ class DevelopmentConfig(BaseConfig):
 
 class ProductionConfig(BaseConfig):
     MONGODB_SETTINGS = {
-            'host': 'mongodb://mongo/shoppings'
+            'host': 'mongodb://mongos1/shoppings'
         }
     # MONGO_URIS
-    MONGO_URI = 'mongodb://mongo/shoppings'
+    MONGO_URI = 'mongodb://mongos1/shoppings'
