@@ -17,7 +17,7 @@ from flask import current_app as app
 
 
 class SparkApp(object):
-    def __init__(self, executor_memory="3g", master_uri=None, mongo_uri=None,
+    def __init__(self, executor_memory="2560m", master_uri=None, mongo_uri=None,
                  deploy_mode="cluster"):
         self.executor_memory = executor_memory
         self.master_uri = app.config.get("SPARK_MASTER_URI") if master_uri is \
