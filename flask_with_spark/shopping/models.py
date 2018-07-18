@@ -7,6 +7,7 @@ from user.models import User
 class Product(db.DynamicDocument):
     meta = {
         'collection': 'products',
+        'shard_key': 'asin',
         'indexes': [
             'title',
             "asin",
@@ -28,7 +29,8 @@ class Product(db.DynamicDocument):
 class Review(db.DynamicDocument):
     meta = {
         'collection': 'reviews',
-        'indexes': ['asin', 'reviewerID', '-unixReviewTime']
+        'indexes': ['asin', 'reviewerID', '-unixReviewTime'],
+        'shard_key': ('asin', 'reviewerID'),
     }
     userid = db.StringField(db_field="reviewerID", required=True)
     productid = db.StringField(db_field="asin", required=True)
@@ -48,7 +50,8 @@ class ProductName(db.DynamicDocument):
             {"fields": ['$title'],
              "default_language":'english',
              }
-        ]
+        ],
+        'shard_key': 'title',
     }
     title = db.StringField(db_field="title", required=True)
 
@@ -81,7 +84,8 @@ class RecommendTable(db.DynamicDocument):
 class SimilarityTable(db.DynamicDocument):
     meta = {
         'collection': 'similarity_table',
-        'indexes': ['item']
+        'indexes': ['item'],
+        'shard_key': 'productid',
     }
     productid = db.StringField(db_field="item", required=True)
     product_match = db.StringField(db_field="item_other")
