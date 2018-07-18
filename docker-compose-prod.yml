@@ -160,8 +160,6 @@ services:
   shard01b:
     image: mongo:3.4
     command: mongod --port 27018 --shardsvr --replSet shard01 --noprealloc --smallfiles --oplogSize 16
-    expose:
-      - "27017"
     volumes:
       - mongo-data-1:/data/db
     networks:
@@ -172,8 +170,6 @@ services:
     command: mongod --port 27019 --shardsvr --replSet shard02 --noprealloc --smallfiles --oplogSize 16
     ports:
       - 27019:27017
-    expose:
-      - "27017"
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-data-2:/data/db
@@ -189,8 +185,6 @@ services:
   shard02b:
     image: mongo:3.4
     command: mongod --port 27019 --shardsvr --replSet shard02 --noprealloc --smallfiles --oplogSize 16
-    expose:
-      - "27017"
     volumes:
       - mongo-data-2:/data/db
     networks:
@@ -202,8 +196,6 @@ services:
     command: mongod --port 27020 --shardsvr --replSet shard03 --noprealloc --smallfiles --oplogSize 16
     ports:
       - 27020:27017
-    expose:
-      - "27017"
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-data-3:/data/db
@@ -219,8 +211,6 @@ services:
   shard03b:
     image: mongo:3.4
     command: mongod --port 27020 --shardsvr --replSet shard03 --noprealloc --smallfiles --oplogSize 16
-    expose:
-      - "27017"
     volumes:
       - mongo-data-3:/data/db
     networks:
