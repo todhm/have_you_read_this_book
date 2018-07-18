@@ -1,3 +1,3 @@
 #!/bin/bash
-while ! nc -z config01:27017; do sleep 3; done
+dockerize -wait tcp://config01:27017 -timeout 20s
 mongo --port 27018 < /scripts/init-shard01.js

@@ -104,8 +104,6 @@ services:
   config01:
     image: mongo:3.4
     command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
-    expose:
-      - "27017"
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-config-1:/data/db
@@ -119,8 +117,6 @@ services:
   config02:
     image: mongo:3.4
     command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
-    expose:
-      - "27017"
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-config-2:/data/db
@@ -130,8 +126,6 @@ services:
   config03:
     image: mongo:3.4
     command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16
-    expose:
-      - "27017"
     volumes:
       - ~/have_you_read_this_book/mongo/scripts:/scripts
       - mongo-config-3:/data/db
