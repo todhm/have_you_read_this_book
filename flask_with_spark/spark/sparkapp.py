@@ -32,7 +32,6 @@ class SparkApp(object):
             builder.\
             master(self.master_uri).\
             config("spark.jars.packages", "org.mongodb.spark:mongo-spark-connector_2.11:2.2.3").\
-            config("spark.executor.memory", self.executor_memory).\
             getOrCreate()
         self.spark = spark
 
@@ -194,7 +193,7 @@ class SparkApp(object):
 
         itemBased = compute_item_similarity(selectedDf, user_col='reviewerID',
                                             item_col='asin', rating_col='overall',
-                                            method='cosine', use_persist=False)
+                                            method='cosine', use_persist=True)
 
         col_name = self.MONGO_URI + ".similarity_table"
         itemBased.write\

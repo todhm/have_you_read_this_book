@@ -82,7 +82,7 @@ services:
     volumes:
       - data:/data/db
     networks:
-      - sparknetwork
+      - mongo
 
   data2:
     image: mongo:3.4
@@ -93,7 +93,7 @@ services:
     volumes:
       - data:/data/db
     networks:
-      - sparknetwork
+      - mongo
 
   data3:
     image: mongo:3.4
@@ -104,7 +104,7 @@ services:
     volumes:
       - data:/data/db
     networks:
-      - sparknetwork
+      - mongo
 
   cfg1:
     image: mongo:3.4
@@ -115,7 +115,7 @@ services:
     volumes:
       - cfg:/data/configdb
     networks:
-      - sparknetwork
+      - mongo
 
   cfg2:
     image: mongo:3.4
@@ -126,7 +126,7 @@ services:
     volumes:
       - cfg:/data/configdb
     networks:
-      - sparknetwork
+      - mongo
 
   cfg3:
     image: mongo:3.4
@@ -137,7 +137,7 @@ services:
     volumes:
       - cfg:/data/configdb
     networks:
-      - sparknetwork
+      - mongo
 
   mongos1:
     image: mongo:3.4
@@ -147,9 +147,12 @@ services:
       - 27017
     networks:
       - sparknetwork
+      - mongo
     deploy:
       placement:
         constraints: [node.hostname == default]
+    volumes:
+      - ./mongo/shoppings:/shoppings
 
 
   mongos2:
@@ -160,6 +163,7 @@ services:
       - 27017
     networks:
       - sparknetwork
+      - mongo
 
   bootstrap:
     image: stefanprodan/mongo-bootstrap:latest
@@ -170,6 +174,7 @@ services:
       - '-mongos=mongos1:27017,mongos2:27017'
     networks:
       - sparknetwork
+      - mongo
 
   redis:
     image: redis:alpine
@@ -214,7 +219,7 @@ services:
     depends_on:
       - spark-master
     deploy:
-        replicas: 10
+        replicas: 25
     ports:
       - "8082:8081"
     environment:
@@ -228,4 +233,6 @@ volumes:
 
 networks:
     sparknetwork:
+      external: true
+    mongo:
       external: true

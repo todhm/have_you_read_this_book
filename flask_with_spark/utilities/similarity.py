@@ -48,7 +48,7 @@ def compute_item_similarity(ratings, user_col='user', item_col='item',
 
     # persist dataframe if selected
     if use_persist:
-        user_item_ratings.persist()
+        user_item_ratings.cache()
 
     if method=='cosine':
         # regular cosine similarity
@@ -74,7 +74,7 @@ def compute_item_similarity(ratings, user_col='user', item_col='item',
         # redo persist of new normalized user item ratings
         if use_persist:
             user_item_ratings.unpersist()
-            user_item_ratings_normed.persist()
+            user_item_ratings_normed.cache()
 
         # compute cosine similarity on normed data
         item_similarity = item_cosine_similarity(user_item_ratings)

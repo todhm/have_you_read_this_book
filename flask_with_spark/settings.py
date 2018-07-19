@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 
 
-TEST_MONGO_URI = 'mongodb://mongo/test_shoppings'
+TEST_MONGO_URI = 'mongodb://mongos1/test_shoppings'
 
 
 class BaseConfig:
@@ -32,10 +32,10 @@ class BaseConfig:
 
 class DevelopmentConfig(BaseConfig):
     MONGODB_SETTINGS = {
-            'host': 'mongodb://mongo/sample_shoppings'
+            'host': 'mongodb://mongos1/sample_shoppings'
         }
     # MONGO_URIS
-    MONGO_URI = 'mongodb://mongo/sample_shoppings'
+    MONGO_URI = 'mongodb://mongos1/sample_shoppings'
 
 
 class ProductionConfig(BaseConfig):

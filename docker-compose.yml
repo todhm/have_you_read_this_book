@@ -17,7 +17,7 @@ services:
     depends_on:
       - spark-master
       - redis
-      - mongo
+      - mongos1
     environment:
      - SPARK_APPLICATION_PYTHON_LOCATION =/app/wsgi.py
      - SPARK_MASTER_NAME=spark-master
@@ -36,7 +36,7 @@ services:
       - "9000:9000"
     depends_on:
       - webapp
-      - mongo
+      - mongos1
       - spark-master
       - redis
     environment:
@@ -58,7 +58,7 @@ services:
       - "9050:9050"
     depends_on:
       - webapp
-      - mongo
+      - mongos1
       - spark-master
       - redis
       - celery_worker
@@ -71,7 +71,7 @@ services:
      - APP_SETTINGS=settings.DevelopmentConfig
 
 
-  mongo:
+  mongos1:
     image: mongo:3.4
     restart: always
     volumes:
