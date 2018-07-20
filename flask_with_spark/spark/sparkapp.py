@@ -107,7 +107,6 @@ class SparkApp(object):
         users = self.return_col(col_name="user")
         selectedDf = reviews\
             .select("reviewerID", "asin", "overall")
-        selectedDf.cache()
 
         '''
         Make string indexer to convert string to index
@@ -127,10 +126,8 @@ class SparkApp(object):
         reviewStringModel = reviewerIndexer.fit(selectedDf)
         selectedDf = reviewStringModel.transform(selectedDf)
         reviewer_labels = reviewStringModel.labels
-        reviewer_labels.cache()
         productStringModel = productIndexer.fit(selectedDf)
         product_labels = productStringModel.labels
-        product_labels.cache()
         transformedFeatures = productStringModel.transform(selectedDf)
 
         # Develop Model
@@ -193,7 +190,7 @@ class SparkApp(object):
 
         itemBased = compute_item_similarity(selectedDf, user_col='reviewerID',
                                             item_col='asin', rating_col='overall',
-                                            method='cosine', use_persist=True)
+                                            method='cosine', use_persist=False)
 
         col_name = self.MONGO_URI + ".similarity_table"
         itemBased.write\

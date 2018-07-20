@@ -188,9 +188,6 @@ services:
     ports:
       - "8080:8080"
       - "7077:7077"
-    deploy:
-      placement:
-        constraints: [node.hostname == default]
 
     environment:
       - INIT_DAEMON_STEP=setup_spark
@@ -202,29 +199,13 @@ services:
     - sparknetwork
 
     deploy:
-      placement:
-        constraints: [node.hostname == default]
+        replicas: 6
     depends_on:
       - spark-master
     ports:
       - "8081:8081"
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
-
-
-  spark-worker-2:
-    image: bde2020/spark-worker:2.3.0-hadoop2.7
-    networks:
-    - sparknetwork
-    depends_on:
-      - spark-master
-    deploy:
-        replicas: 25
-    ports:
-      - "8082:8081"
-    environment:
-      - "SPARK_MASTER=spark://spark-master:7077"
-
 
 volumes:
     data: {}
