@@ -235,6 +235,7 @@ class SparkApp(object):
     def convert_reviewerid(self):
         self.create_spark_app()
         reviews = self.return_col(col_name="reviews")
+        reviews = reviews.select("reviewerID")
         reviewerIndexer = StringIndexer(
             inputCol="reviewerID",
             outputCol="rI",
