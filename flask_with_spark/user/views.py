@@ -27,6 +27,7 @@ def login():
         user = User.objects.filter(email = form.email.data).first()
         session['username'] = user.username
         session['email'] = user.email
+        session['userIntId'] = user.userIntId
         if 'next' in session:
             next = session.get('next')
             session.pop('next')
@@ -35,7 +36,7 @@ def login():
             return redirect(url_for('shopping_app.homepage'))
     return render_template("user/login.html",form=form,STATE=state)
 
-@user_app.route('/signup',methods=('GET', 'POST'))
+@user_app.route('/signup', methods=('GET', 'POST'))
 @logout_required
 def signup():
     form = SignUpForm()
@@ -50,6 +51,7 @@ def signup():
         user.save()
         session['username'] = form.username.data
         session['email']  = form.email.data
+        session['userIntId'] = user.userIntId
         return redirect(url_for("shopping_app.homepage"))
 
     return render_template("user/signup.html",form=form)
@@ -59,4 +61,5 @@ def signup():
 def logout():
     session.pop('email')
     session.pop('username')
+    session.pop('userIntId')
     return redirect(url_for('user_app.login'))

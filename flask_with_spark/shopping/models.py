@@ -11,6 +11,7 @@ class Product(db.DynamicDocument):
         'indexes': [
             'title',
             "asin",
+            "pI",
             '-created',
             {"fields": ['$title', '$description'],
              "default_language":'english',
@@ -18,21 +19,24 @@ class Product(db.DynamicDocument):
              ]
     }
     asin = db.StringField(db_field="asin", required=True, unique=True)
+    productIntId = db.IntField(db_field="pI")
     title = db.StringField(db_field="title", required=True)
     description = db.StringField(db_field="description", required=True)
     imageUrl = db.StringField(db_field="imUrl")
-    created = db.IntField(db_filed="c", default=now())
-    related = db.DictField(db_filed="related")
-    price = db.FloatField(db_filed="price")
+    created = db.IntField(db_field="c", default=now())
+    related = db.DictField(db_field="related")
+    price = db.FloatField(db_field="price")
 
 
 class Review(db.DynamicDocument):
     meta = {
         'collection': 'reviews',
-        'indexes': ['asin', 'reviewerID', '-unixReviewTime'],
+        'indexes': ['asin', 'reviewerID', 'pI', '-unixReviewTime', 'rI'],
         'shard_key': ('asin', 'reviewerID'),
     }
     userid = db.StringField(db_field="reviewerID", required=True)
+    reviewerIntId = db.IntField(db_field="rI")
+    productIntId = db.IntField(db_field="pI")
     productid = db.StringField(db_field="asin", required=True)
     username = db.StringField(db_field="reviewerName")
     helpful = db.ListField(db_field="helpful")
@@ -64,11 +68,11 @@ class BestProduct(db.DynamicDocument):
     asin = db.StringField(db_field="asin", required=True)
     avgOverall = db.FloatField(db_field="ao")
     title = db.StringField(db_field="t", required=True)
-    price = db.FloatField(db_filed="p")
+    price = db.FloatField(db_field="p")
     imageUrl = db.StringField(db_field="iu")
     description = db.StringField(db_field="d")
     cnt = db.IntField(db_field="cnt")
-    created = db.IntField(db_filed="dc", default=now())
+    created = db.IntField(db_field="dc", default=now())
 
 
 class RecommendTable(db.DynamicDocument):
@@ -76,9 +80,9 @@ class RecommendTable(db.DynamicDocument):
         'collection': 'recommendation_table',
         'indexes': ['t']
     }
-    userid = db.StringField(db_field="reviewerID")
+    userIntId = db.IntField(db_field="rI")
     recommendList = db.ListField(db_field="recommendations", required=True)
-    created = db.IntField(db_filed="dc", default=now())
+    created = db.IntField(db_field="dc", default=now())
 
 
 class SimilarityTable(db.DynamicDocument):

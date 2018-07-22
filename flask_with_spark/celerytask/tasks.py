@@ -27,3 +27,9 @@ def make_similarity_table_task(self):
 def make_recommendation_task(self):
     spark_command = make_recommendation_model()
     os.system(spark_command)
+
+
+@celery.task(bind=True)
+def convert_to_integer_task(self):
+    spark_command = convert_to_integer()
+    os.system(spark_command)

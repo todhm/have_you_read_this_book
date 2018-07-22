@@ -6,5 +6,6 @@ class User(db.Document):
     username = db.StringField(db_field="u", required=True)
     password = db.StringField(db_field="p", required=True)
     email = db.EmailField(db_field="e", required=True, unique=True)
-    created = db.IntField(db_filed="c", default=now())
+    created = db.IntField(db_field="c", default=now())
+    userIntId = db.IntField(db_field="rI", default=now())
     meta = {'indexes': ['username', 'email', '-created']}

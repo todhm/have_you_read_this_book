@@ -106,71 +106,39 @@ class SparkApp(object):
         reviews = self.return_col(col_name="reviews")
         users = self.return_col(col_name="user")
         selectedDf = reviews\
-            .select("reviewerID", "asin", "overall")
-
-        '''
-        Make string indexer to convert string to index
-        to make no error in ALS model
-        '''
-
-        reviewerIndexer = StringIndexer(
-            inputCol="reviewerID",
-            outputCol="userCol",
-            handleInvalid="keep"
-            )
-        productIndexer = StringIndexer(
-            inputCol="asin",
-            outputCol="itemCol",
-            handleInvalid="keep"
-            )
-        reviewStringModel = reviewerIndexer.fit(selectedDf)
-        selectedDf = reviewStringModel.transform(selectedDf)
-        reviewer_labels = reviewStringModel.labels
-        productStringModel = productIndexer.fit(selectedDf)
-        product_labels = productStringModel.labels
-        transformedFeatures = productStringModel.transform(selectedDf)
+            .select("rI", "pI", "overall")
 
         # Develop Model
         als = ALS(
-            maxIter=10, regParam=0.01, userCol="userCol",
-            itemCol="itemCol", ratingCol="overall",
+            maxIter=10, regParam=0.01, userCol="rI",
+            itemCol="pI", ratingCol="overall",
             coldStartStrategy="nan"
               )
-        alsModel = als.fit(transformedFeatures)
+        alsModel = als.fit(selectedDf)
 
         # Only make recommendation for active users
-        activeUsers = [x.e for x in users.select("e").collect()]
-        selectedData = transformedFeatures[transformedFeatures
-                                           .reviewerID.isin(activeUsers)]
+        activeUsers = [x.rI for x in users.select("rI").collect()]
+        selectedData = selectedDf[selectedDf.rI.isin(activeUsers)]
 
         # make reverse tarnsform to productID and userID
         num_recommends = 10
         recommendationData = alsModel.recommendForUserSubset(
             selectedData,
             num_recommends
-            )
-        product_labels_ = F.array(*[F.lit(x) for x in product_labels])
+        )
         recommendations = F.array(*[F.struct(
-            product_labels_[F.col("recommendations")[i]["itemCol"]].alias("itemCol"),
+            F.col("recommendations")[i]["pI"].alias("pI"),
             F.col("recommendations")[i]["rating"].cast("double").alias("rating")
         ) for i in range(num_recommends)])
 
         recommendationData = recommendationData\
             .withColumn("recommendations", recommendations)
-        userReverse = IndexToString(
-            inputCol="userCol",
-            outputCol="reviewerID",
-            labels=reviewer_labels
-            )
-        recommendationData = userReverse\
-            .transform(recommendationData)\
-            .select("reviewerID", "recommendations")
-
         createdDate = now()
         recommendationData = recommendationData.withColumn(
             "dc",
             F.lit(createdDate)
         )
+
         # Save data to mongodb
         col_name = self.MONGO_URI + ".recommendation_table"
         recommendationData.write\
@@ -199,24 +167,38 @@ class SparkApp(object):
             .option("uri", col_name)\
             .save()
 
-    def load_model(self, pipeline_model_name, als_model_name, user_id):
-        # Set SparkSession Object to run spark app
+    def convertIdToInteger(self):
         self.create_spark_app()
+        products = self.return_col("products")
         reviews = self.return_col(col_name="reviews")
-
-        unwatched_books = reviews\
-            .filter(F.col('reviewerID') != user_id)\
-            .select("asin").distinct()
-
-        test_data = unwatched_books.withColumn(
-            "reviewerID",
-            F.lit(user_id)
+        reviewerIndexer = StringIndexer(
+            inputCol="reviewerID",
+            outputCol="rI",
+            handleInvalid="keep"
             )
+        productIndexer = StringIndexer(
+            inputCol="asin",
+            outputCol="pI",
+            handleInvalid="keep"
+            )
+        productStringModel = productIndexer.fit(products)
+        productTransformed = productStringModel.transform(products)
+        reviewStringModel = reviewerIndexer.fit(reviews)
+        reviewTransformed = reviewStringModel.transform(reviews)
+        reviewTransformed = productStringModel.transform(reviewTransformed)
+        # Save data to mongodb
+        reviews_col = self.MONGO_URI + ".reviews"
+        reviewTransformed.write\
+            .format("com.mongodb.spark.sql.DefaultSource")\
+            .mode("append")\
+            .option("uri", reviews_col)\
+            .save()
+        product_col = self.MONGO_URI + ".products"
+        productTransformed.write\
+            .format("com.mongodb.spark.sql.DefaultSource")\
+            .mode("append")\
+            .option("uri", product_col)\
+            .save()
 
-        pipelineModel = PipelineModel.read().load(pipeline_model_name)
-        transformedDf = pipelineModel.transform(test_data)
-        alsModel = ALSModel.load(als_model_name)
-        final_data = alsModel.transform(transformedDf)
-        top_model = final_data.sort(F.desc('predict')).limit(10)
         self.spark.catalog.clearCache()
         self.spark.stop()

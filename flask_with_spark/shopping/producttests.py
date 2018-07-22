@@ -25,6 +25,8 @@ class ProductTest(TestUtil):
             confirm="test123"
             ),
             follow_redirects=True)
+        user = User.objects.filter(email=self.test_userid).first()
+        self.test_userIntId = user.userIntId
 
     def test_index_page_with_none(self):
         rv = self.client.get('/')
@@ -123,9 +125,9 @@ class ProductTest(TestUtil):
             start_num=0,
             end_num=10,
         )
-        book_id_lst = [book['asin'] for book in book_obj_list]
+        book_id_lst = [book['productIntId'] for book in book_obj_list]
         similarity_table_list = self.add_recommendation_table(
-            userid=self.test_userid,
+            userid=self.test_userIntId,
             product_list=book_id_lst,
         )
         rv = self.client.get('/')
@@ -141,9 +143,9 @@ class ProductTest(TestUtil):
                 end_num=10,
                 title="firsttest"
             )
-            first_book_id_lst = [book['asin'] for book in first_book_obj_list]
+            first_book_id_lst = [book['productIntId'] for book in first_book_obj_list]
             similarity_table_list = self.add_recommendation_table(
-                userid=self.test_userid,
+                userid=self.test_userIntId,
                 product_list=first_book_id_lst
             )
             frozen_datetime.tick(delta=timedelta(seconds=1))
@@ -152,14 +154,13 @@ class ProductTest(TestUtil):
                 end_num=20,
                 title="secondtest"
             )
-            second_book_id_lst = [book['asin'] for book in second_book_obj_list]
+            second_book_id_lst = [book['productIntId'] for book in second_book_obj_list]
             similarity_table_list = self.add_recommendation_table(
-                userid=self.test_userid,
+                userid=self.test_userIntId,
                 product_list=second_book_id_lst,
             )
         rv = self.client.get('/')
         page = rv.data.decode('utf-8')
-        print(page)
         for book_obj in first_book_obj_list:
             self.assertFalse(book_obj['title'] in page)
 

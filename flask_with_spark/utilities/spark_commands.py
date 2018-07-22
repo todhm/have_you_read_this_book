@@ -45,3 +45,15 @@ def make_similarity_table():
     spark_command += app.config['SPARK_MASTER_URI'] + ' '
     spark_command += app.config["MONGODB_SETTINGS"]["host"] + ' '
     return spark_command
+
+
+def convert_to_integer():
+    mongospark_package = app.config['SPARK_MONGO_PACKAGE']
+    spark_master_uri = app.config['SPARK_MASTER_URI']
+    spark_command = '/spark/bin/spark-submit --packages {} '.format(mongospark_package)
+    spark_command += '--master {} '.format(spark_master_uri)
+    spark_command += '--deploy-mode client '
+    spark_command += '/app/spark/convert_to_integer.py '
+    spark_command += app.config['SPARK_MASTER_URI'] + ' '
+    spark_command += app.config["MONGODB_SETTINGS"]["host"] + ' '
+    return spark_command

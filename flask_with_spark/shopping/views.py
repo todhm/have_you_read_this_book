@@ -24,7 +24,8 @@ def homepage():
     error = None
     # Get best product based on review
     best_product_list = BestProduct.objects.order_by("-created").limit(10)
-
+    userIntId = session['userIntId']
+    email = session['email']
     # Show the most similar books based on last user review
     if Review.objects.filter(userid=session['email']).count() > 0:
         last_review = Review\
@@ -50,17 +51,17 @@ def homepage():
         last_product = None
         similar_products = None
 
-    if RecommendTable.objects.filter(userid=session['email']).count() > 0:
+    if RecommendTable.objects.filter(userIntId=userIntId).count() > 0:
         last_recommend = RecommendTable\
             .objects\
-            .filter(userid=session['email'])\
+            .filter(userIntId=session['userIntId'])\
             .order_by("-created")\
             .first()
         product_lst = last_recommend.recommendList
-        product_id_lst = [product['itemCol'] for product in product_lst]
+        product_id_lst = [product['pI'] for product in product_lst]
         recommend_products = Product\
             .objects\
-            .filter(asin__in=product_id_lst)
+            .filter(productIntId__in=product_id_lst)
     else:
         recommend_products = None
     return render_template(
@@ -148,12 +149,15 @@ def find_book(find_value="", page=1):
         .paginate(page=page, per_page=per_page)
     # If user add  validated review on new page add review and show it
     if request.method == "POST" and form.validate(email=session['email']):
+        productIntId = book.productIntId
         review = Review(
             userid=session['email'],
             productid=form.productid.data,
             username=session['username'],
             review=form.review.data,
-            overall=form.overall.data
+            overall=form.overall.data,
+            reviewerIntId=session['userIntId'],
+            productIntId=productIntId,
         )
         review.save()
         return redirect(

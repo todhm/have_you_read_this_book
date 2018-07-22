@@ -8,6 +8,7 @@ from pymongo import MongoClient
 from mongoengine.connection import _get_db
 import unittest
 from utilities.common import utc_now_ts
+import time
 
 
 class TestUtil(unittest.TestCase):
@@ -27,8 +28,11 @@ class TestUtil(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.client = self.app.test_client()
         self.app_context.push()
+        self._started_at = time.time()
 
     def tearDown(self):
+        elapsed = time.time() - self._started_at
+        print('{} ({}s)'.format(self.id(), round(elapsed, 2)))
         db = _get_db()
         db.client.drop_database(db)
         db.client.close()
@@ -65,11 +69,13 @@ class TestUtil(unittest.TestCase):
             book_description = description + book_id
             book_obj = dict(
                 asin=book_id,
+                productIntId=i,
                 title=book_name,
                 description=book_description
             )
             product = Product(
                 asin=book_id,
+                productIntId=i,
                 title=book_name,
                 description=book_description,
                 )
@@ -87,6 +93,7 @@ class TestUtil(unittest.TestCase):
                 username=str(i),
                 password='test1234',
                 email=email,
+                userIntId=i,
             )
             user_list.append(user)
         User.objects.insert(user_list)
@@ -125,6 +132,8 @@ class TestUtil(unittest.TestCase):
                                         review_point=None,
                                         base_id="todhm",
                                         base_email="@gmail.com",
+                                        base_bookname="test",
+                                        base_description="test_description"
 
                                         ):
         asin_list = []
@@ -134,10 +143,11 @@ class TestUtil(unittest.TestCase):
         Product.ensure_indexes()
         for i in range(start_num, end_num):
             book_id = str(i)
-            book_name = "test" + book_id
-            description = "test_description" + book_id
+            book_name = base_bookname + book_id
+            description = base_description + book_id
             product = Product(
                 asin=book_id,
+                productIntId=i,
                 title=book_name,
                 description=description,
                 price=randint(100, 100000),
@@ -151,6 +161,8 @@ class TestUtil(unittest.TestCase):
                 overall = randint(0, 5) if review_point is None\
                     else review_point
                 review = Review(
+                    productIntId=i,
+                    reviewerIntId=x,
                     userid=test_user_id,
                     productid=book_id,
                     username="test",
@@ -162,6 +174,71 @@ class TestUtil(unittest.TestCase):
         Product.objects.insert(product_list)
         Review.objects.insert(review_list)
         return asin_list
+
+    def return_random_product_and_reviews(self,
+                                          start_num=0, end_num=100,
+                                          reviewer_start_num=0,
+                                          reviewer_end_num=10,
+                                          review_point=None,
+                                          base_book_id="testid",
+                                          base_id="todhm",
+                                          base_email="@gmail.com",
+                                          base_bookname="test",
+                                          base_description="test_description",
+                                          imageUrl="/src/test/test",
+                                          ):
+        product_list = []
+        return_product_list = []
+        review_list = []
+        return_review_list = []
+        Review.ensure_indexes()
+        Product.ensure_indexes()
+        for i in range(start_num, end_num):
+            book_id = base_book_id + str(i)
+            book_name = base_bookname + book_id
+            description = base_description + book_id
+            price = randint(100, 100000)
+            product_obj = dict(
+                asin=book_id,
+                title=book_name,
+                description=description,
+                price=price,
+                imageUrl=imageUrl,
+            )
+            product = Product(
+                asin=book_id,
+                title=book_name,
+                description=description,
+                price=price,
+                imageUrl=imageUrl,
+                )
+            return_product_list.append(product_obj)
+            product_list.append(product)
+
+            for x in range(reviewer_start_num, reviewer_end_num):
+                test_user_id = base_id + str(x) + base_email
+                overall = randint(0, 5) if review_point is None\
+                    else review_point
+                review = Review(
+                    userid=test_user_id,
+                    productid=book_id,
+                    username="test",
+                    review="good",
+                    overall=overall
+                )
+                review_obj = dict(
+                    userid=test_user_id,
+                    productid=book_id,
+                    username="test",
+                    review="good",
+                    overall=overall
+                )
+                return_review_list.append(review_obj)
+                review_list.append(review)
+
+        Product.objects.insert(product_list)
+        Review.objects.insert(review_list)
+        return return_product_list, return_review_list
 
     def add_multiple_review_for_user(self, reviewer_id, start_num=0,
                                      end_num=100, username="test",
@@ -232,12 +309,12 @@ class TestUtil(unittest.TestCase):
 
     def add_recommendation_table(self, userid, product_list):
         product_list = [
-            {"itemCol": product_id, "rating": randint(0, 5)}
+            {"pI": product_id, "rating": randint(0, 5)}
             for product_id in product_list
             ]
         created = utc_now_ts()
         recommendTable = RecommendTable(
-            userid=userid,
+            userIntId=userid,
             recommendList=product_list,
             created=created
         )
