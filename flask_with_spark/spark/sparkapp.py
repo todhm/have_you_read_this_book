@@ -188,12 +188,14 @@ class SparkApp(object):
         reviewTransformed = productStringModel.transform(reviewTransformed)
         # Save data to mongodb
         reviews_col = self.MONGO_URI + ".reviews"
+        reviewTransformed = reviewTransformed.repartition(300)
         reviewTransformed.write\
             .format("com.mongodb.spark.sql.DefaultSource")\
             .mode("append")\
             .option("uri", reviews_col)\
             .save()
         product_col = self.MONGO_URI + ".products"
+        productTransformed = productTransformed.repartition(300)
         productTransformed.write\
             .format("com.mongodb.spark.sql.DefaultSource")\
             .mode("append")\

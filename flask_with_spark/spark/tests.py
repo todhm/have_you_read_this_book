@@ -127,13 +127,13 @@ class SparkAppTest(TestUtil):
     def test_convert_integer(self):
         product_list, review_list = self.return_random_product_and_reviews(
             start_num=0,
-            end_num=200,
+            end_num=600,
             reviewer_start_num=0,
             reviewer_end_num=10,
         )
         spark_command = convert_to_integer()
-
         os.system(spark_command)
+
         for product_obj in product_list:
             product_id = product_obj['asin']
             product = Product.objects.filter(asin=product_id).first()
