@@ -188,19 +188,67 @@ class SparkApp(object):
         reviewTransformed = productStringModel.transform(reviewTransformed)
         # Save data to mongodb
         reviews_col = self.MONGO_URI + ".reviews"
-        reviewTransformed = reviewTransformed.repartition(300)
         reviewTransformed.write\
             .format("com.mongodb.spark.sql.DefaultSource")\
             .mode("append")\
             .option("uri", reviews_col)\
             .save()
         product_col = self.MONGO_URI + ".products"
-        productTransformed = productTransformed.repartition(300)
         productTransformed.write\
             .format("com.mongodb.spark.sql.DefaultSource")\
             .mode("append")\
             .option("uri", product_col)\
             .save()
 
+        self.spark.catalog.clearCache()
+        self.spark.stop()
+
+    def convert_productid(self):
+        self.create_spark_app()
+        products = self.return_col("products")
+        reviews = self.return_col(col_name="reviews")
+        productIndexer = StringIndexer(
+            inputCol="asin",
+            outputCol="pI",
+            handleInvalid="keep"
+            )
+        productStringModel = productIndexer.fit(products)
+        productTransformed = productStringModel.transform(products)
+        reviewTransformed = productStringModel.transform(reviews)
+        # Save data to mongodb
+        reviews_col = self.MONGO_URI + ".reviews"
+        reviewTransformed.write\
+            .format("com.mongodb.spark.sql.DefaultSource")\
+            .mode("append")\
+            .option("uri", reviews_col)\
+            .save()
+        product_col = self.MONGO_URI + ".products"
+        productTransformed.write\
+            .format("com.mongodb.spark.sql.DefaultSource")\
+            .mode("append")\
+            .option("uri", product_col)\
+            .save()
+
+        self.spark.catalog.clearCache()
+        self.spark.stop()
+
+    def convert_reviewerid(self):
+        self.create_spark_app()
+        reviews = self.return_col(col_name="reviews")
+        reviewerIndexer = StringIndexer(
+            inputCol="reviewerID",
+            outputCol="rI",
+            handleInvalid="keep"
+            )
+
+        reviewStringModel = reviewerIndexer.fit(reviews)
+        reviewTransformed = reviewStringModel.transform(reviews)
+        # Save data to mongodb
+        reviews_col = self.MONGO_URI + ".reviews"
+        reviewTransformed.write\
+            .format("com.mongodb.spark.sql.DefaultSource")\
+            .mode("append")\
+            .option("uri", reviews_col)\
+            .save()
         self.spark.catalog.clearCache()
         self.spark.stop()

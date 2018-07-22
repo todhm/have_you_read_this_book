@@ -33,3 +33,15 @@ def make_recommendation_task(self):
 def convert_to_integer_task(self):
     spark_command = convert_to_integer()
     os.system(spark_command)
+
+
+@celery.task(bind=True)
+def convert_productid_task(self):
+    spark_command = convert_productid()
+    os.system(spark_command)
+
+
+@celery.task(bind=True)
+def convert_reviewerid_task(self):
+    spark_command = convert_reviewerid()
+    os.system(spark_command)

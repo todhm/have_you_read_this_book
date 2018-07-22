@@ -1,11 +1,12 @@
 import pyspark.sql.functions as F
+from pyspark.sql.window import Window
 
 SIMILARITY_METHODS = ['cosine', ' adjusted_cosine', 'pearson']
 
 
 def compute_item_similarity(ratings, user_col='user', item_col='item',
                             rating_col='rating', method='cosine',
-                            use_persist=False):
+                            use_persist=False, data_limit=10):
     """Compute item-item similarities from a dataframe with
     user item ratings in long format.
 
@@ -82,6 +83,13 @@ def compute_item_similarity(ratings, user_col='user', item_col='item',
         # unpersist data
         if use_persist:
             user_item_ratings_normed.unpersist()
+
+    window = Window.partitionBy(item_similarity['item'])\
+        .orderBy(item_similarity['sim'].desc())
+
+    item_similarity = item_similarity\
+        .select('*', F.rank().over(window).alias('rank'))\
+        .filter(F.col('rank') <= data_limit)
 
     return item_similarity
 

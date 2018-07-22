@@ -122,7 +122,8 @@ class SparkAppTest(TestUtil):
             self.assertTrue(type(similarity.similarity) == float)
             self.assertTrue(type(similarity.productid) == str)
             self.assertTrue(type(similarity.product_match) == str)
-        self.assertTrue(len(similarityList) == (200*199))
+        print(len(similarityList))
+        self.assertTrue(len(similarityList) == (200*10))
 
     def test_convert_integer(self):
         product_list, review_list = self.return_random_product_and_reviews(
@@ -160,4 +161,94 @@ class SparkAppTest(TestUtil):
             self.assertTrue(review.overall == review_obj['overall'])
 
         self.assertTrue(len(Product.objects) == len(product_list))
+        self.assertTrue(len(Review.objects) == len(review_list))
+
+    def test_product_conversion(self):
+        product_list, review_list = self.return_random_product_and_reviews(
+            start_num=0,
+            end_num=600,
+            reviewer_start_num=0,
+            reviewer_end_num=10,
+        )
+        spark_command = convert_reviewerid()
+        os.system(spark_command)
+        for review_obj in review_list:
+            reviewer_id = review_obj['userid']
+            productid = review_obj['productid']
+            review = Review\
+                .objects\
+                .filter(userid=reviewer_id)\
+                .filter(productid=productid)\
+                .first()
+            self.assertTrue(type(review.productIntId) == int)
+            self.assertTrue(review.userid == review_obj['userid'])
+            self.assertTrue(review.productid == review_obj['productid'])
+            self.assertTrue(review.username == review_obj['username'])
+            self.assertTrue(review.review == review_obj['review'])
+            self.assertTrue(review.overall == review_obj['overall'])
+
+        self.assertTrue(len(Product.objects) == len(product_list))
+        self.assertTrue(len(Review.objects) == len(review_list))
+
+    def test_product_conversion(self):
+        product_list, review_list = self.return_random_product_and_reviews(
+            start_num=0,
+            end_num=600,
+            reviewer_start_num=0,
+            reviewer_end_num=10,
+        )
+        spark_command = convert_productid()
+        os.system(spark_command)
+
+        for product_obj in product_list:
+            product_id = product_obj['asin']
+            product = Product.objects.filter(asin=product_id).first()
+            self.assertTrue(type(product.productIntId) == int)
+            self.assertTrue(product.title == product_obj['title'])
+            self.assertTrue(product.description == product_obj['description'])
+            self.assertTrue(int(product.price) == int(product_obj['price']))
+            self.assertTrue(product.imageUrl == product_obj['imageUrl'])
+
+        for review_obj in review_list:
+            reviewer_id = review_obj['userid']
+            productid = review_obj['productid']
+            review = Review\
+                .objects\
+                .filter(userid=reviewer_id)\
+                .filter(productid=productid)\
+                .first()
+            self.assertTrue(type(review.productIntId) == int)
+            self.assertTrue(review.userid == review_obj['userid'])
+            self.assertTrue(review.productid == review_obj['productid'])
+            self.assertTrue(review.username == review_obj['username'])
+            self.assertTrue(review.review == review_obj['review'])
+            self.assertTrue(review.overall == review_obj['overall'])
+
+        self.assertTrue(len(Product.objects) == len(product_list))
+        self.assertTrue(len(Review.objects) == len(review_list))
+
+    def test_reviewid_conversion(self):
+        product_list, review_list = self.return_random_product_and_reviews(
+            start_num=0,
+            end_num=600,
+            reviewer_start_num=0,
+            reviewer_end_num=10,
+        )
+        spark_command = convert_productid()
+        os.system(spark_command)
+        for review_obj in review_list:
+            reviewer_id = review_obj['userid']
+            productid = review_obj['productid']
+            review = Review\
+                .objects\
+                .filter(userid=reviewer_id)\
+                .filter(productid=productid)\
+                .first()
+            self.assertTrue(type(review.productIntId) == int)
+            self.assertTrue(review.userid == review_obj['userid'])
+            self.assertTrue(review.productid == review_obj['productid'])
+            self.assertTrue(review.username == review_obj['username'])
+            self.assertTrue(review.review == review_obj['review'])
+            self.assertTrue(review.overall == review_obj['overall'])
+
         self.assertTrue(len(Review.objects) == len(review_list))

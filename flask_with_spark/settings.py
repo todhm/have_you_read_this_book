@@ -36,6 +36,8 @@ class DevelopmentConfig(BaseConfig):
         }
     # MONGO_URIS
     MONGO_URI = 'mongodb://mongos1/sample_shoppings'
+    SPARK_DRIVER_MEMORY = "1g"
+    SPARK_EXECUTOR_MEMORY = "1g"
 
 
 class ProductionConfig(BaseConfig):
@@ -44,3 +46,5 @@ class ProductionConfig(BaseConfig):
         }
     # MONGO_URIS
     MONGO_URI = 'mongodb://mongos1/shoppings'
+    SPARK_DRIVER_MEMORY = "5g"
+    SPARK_EXECUTOR_MEMORY = "2560mb"
