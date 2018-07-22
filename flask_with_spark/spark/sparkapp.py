@@ -244,6 +244,7 @@ class SparkApp(object):
 
         reviewStringModel = reviewerIndexer.fit(reviews)
         reviewTransformed = reviewStringModel.transform(reviews)
+        reviewTransformed = reviewTransformed.select("rI")
         # Save data to mongodb
         reviews_col = self.MONGO_URI + ".reviews"
         reviewTransformed.write\

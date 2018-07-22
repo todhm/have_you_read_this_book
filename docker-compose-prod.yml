@@ -199,7 +199,7 @@ services:
     - sparknetwork
 
     deploy:
-        replicas: 6
+        replicas: 10
     depends_on:
       - spark-master
     ports:
