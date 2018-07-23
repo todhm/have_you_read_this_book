@@ -32,6 +32,8 @@ class SparkApp(object):
             builder.\
             master(self.master_uri).\
             config("spark.jars.packages", "org.mongodb.spark:mongo-spark-connector_2.11:2.2.3").\
+            config("spark.driver.memoryOverhead", "2g").\
+            config("spark.executor.memoryOverhead", "1g").\
             getOrCreate()
         self.spark = spark
 
