@@ -239,7 +239,6 @@ class SparkApp(object):
         reviewerIndexer = StringIndexer(
             inputCol="reviewerID",
             outputCol="rI",
-            handleInvalid="keep"
             )
 
         reviewStringModel = reviewerIndexer.fit(reviews)
