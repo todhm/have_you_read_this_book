@@ -45,7 +45,29 @@
 {% endif %}
 {% endmacro %}
 
-
+{% macro render_recommendations(product_list, content_id)%}
+<div class="row">
+    <div class="demo">
+        <div class="item">
+            <ul id="{{content_id}}" class="content-slider" >
+                {% for  product in product_list %}
+                <li>
+                    <a href="{{url_for('shopping_app.find_book',find_value=product.asin)}}">
+                    {% if product.title %}
+                        <h4 class="book-title">{{product.title|markdown}}</h4>
+                    {% else %}
+                        <h4 class="book-title">Untitled</h4>
+                    {% endif %}
+                    <td><input name="input-3" value="{{product.avgOverall|int}}" class="rating-loading input-3"></td>
+                    <h6 class="review-count">Review Count:({{product.cnt}})</h6>
+                    <img class="book-image" src="{{product.imageUrl}}" alt="Go to W3Schools!" ></a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endmacro %}
 {% macro render_searchbook(form,search_query="")%}
 <div class="row">
     <div class="col-md-10" >

@@ -1,2 +1,2 @@
 #!/bin/sh
-mongorestore -d sample_shoppings /docker-entrypoint-initdb.d/sample_shoppings
+mongorestore -d shoppings /docker-entrypoint-initdb.d/shoppings

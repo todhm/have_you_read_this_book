@@ -83,6 +83,9 @@ services:
       - data:/data/db
     networks:
       - mongo
+    deploy:
+      placement:
+        constraints: [node.labels.data1 == true]
 
   data2:
     image: mongo:3.4
@@ -94,6 +97,9 @@ services:
       - data:/data/db
     networks:
       - mongo
+    deploy:
+      placement:
+        constraints: [node.labels.data2 == true]
 
   data3:
     image: mongo:3.4
@@ -105,6 +111,9 @@ services:
       - data:/data/db
     networks:
       - mongo
+    deploy:
+      placement:
+        constraints: [node.labels.data3 == true]
 
   cfg1:
     image: mongo:3.4
@@ -116,6 +125,9 @@ services:
       - cfg:/data/configdb
     networks:
       - mongo
+    deploy:
+      placement:
+        constraints: [node.labels.cfg1 == true]
 
   cfg2:
     image: mongo:3.4
@@ -127,6 +139,9 @@ services:
       - cfg:/data/configdb
     networks:
       - mongo
+    deploy:
+      placement:
+        constraints: [node.labels.cfg2 == true]
 
   cfg3:
     image: mongo:3.4
@@ -138,6 +153,9 @@ services:
       - cfg:/data/configdb
     networks:
       - mongo
+    deploy:
+      placement:
+        constraints: [node.labels.cfg3 == true]
 
   mongos1:
     image: mongo:3.4
@@ -150,10 +168,10 @@ services:
       - mongo
     deploy:
       placement:
-        constraints: [node.hostname == default]
+        constraints: [node.labels.mongos1 == true]
     volumes:
-      - ./mongo/shoppings:/shoppings
-
+      - ./mongo/shoppings:/docker-entrypoint-initdb.d/shoppings
+      - ./mongo/restore.sh:/docker-entrypoint-initdb.d/restore.sh
 
   mongos2:
     image: mongo:3.4
@@ -164,6 +182,9 @@ services:
     networks:
       - sparknetwork
       - mongo
+    deploy:
+      placement:
+        constraints: [node.labels.mongos2 == true]
 
   bootstrap:
     image: stefanprodan/mongo-bootstrap:latest

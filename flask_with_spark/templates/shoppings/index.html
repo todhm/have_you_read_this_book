@@ -14,79 +14,24 @@
 {{render_searchbook(form)}}
 {% include '_flashmessages.html' %}
 
+{% from "_formhelpers.html" import render_recommendations %}
 {% if best_product_list%}
 <div class="row book-intro">
-    <p>Books Most popular in H.R.T.B</p>
+    <p>Books Most popular in H.Y.R.T.B</p>
 </div>
-<div class="row">
-    <div class="demo">
-        <div class="item">
-            <ul id="content-slider" class="content-slider" >
-                {% for  product in best_product_list %}
-                <li>
-                    <a href="{{url_for('shopping_app.find_book',find_value=product.asin)}}">
-                    {% if product.title %}
-                        <h4 class="book-title">{{product.title|markdown}}</h4>
-                    {% else %}
-                        <h4 class="book-title">Untitled</h4>
-                    {% endif %}
-                    <td><input name="input-3" value="{{product.avgOverall|int}}" class="rating-loading input-3"></td>
-                    <h6>Review Count:({{product.cnt}})</h6>
-                    <img class="book-image" src="{{product.imageUrl}}" alt="Go to W3Schools!" ></a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-</div>
+{{render_recommendations(best_product_list,"content-slider-1")}}
 {% endif %}
 {% if last_product and similar_products%}
 <div class="row book-intro">
     <p>Book Similar to {{last_product.title}}</p>
 </div>
-<div class="row">
-    <div class="demo">
-        <div class="item">
-            <ul id="content-slider-2" class="content-slider" >
-                {% for  product in similar_products %}
-                <li>
-                    <a href="{{url_for('shopping_app.find_book',find_value=product.asin)}}">
-                    {% if product.title %}
-                        <h4 class="book-title">{{product.title|markdown}}</h4>
-                    {% else %}
-                        <h4 class="book-title">Untitled</h4>
-                    {% endif %}
-                    <img class="book-image" src="{{product.imageUrl}}" alt="Go to W3Schools!" ></a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-</div>
+{{render_recommendations(similar_products,"content-slider-2")}}
 {% endif %}
 {% if recommend_products%}
 <div class="row book-intro">
     <p>Book recommendation based on your reviews</p>
 </div>
-<div class="row">
-    <div class="demo">
-        <div class="item">
-            <ul id="content-slider-2" class="content-slider" >
-                {% for  product in recommend_products %}
-                <li>
-                    <a href="{{url_for('shopping_app.find_book',find_value=product.asin)}}">
-                    {% if product.title %}
-                        <h4 class="book-title">{{product.title|markdown}}</h4>
-                    {% else %}
-                        <h4 class="book-title">Untitled</h4>
-                    {% endif %}
-                    <img class="book-image" src="{{product.imageUrl}}" alt="Go to W3Schools!" ></a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-</div>
+{{render_recommendations(recommend_products,"content-slider-3")}}
 {% endif %}
 
 {% endblock %}

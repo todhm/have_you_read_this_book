@@ -50,7 +50,8 @@ class ReviewTest(TestUtil):
         rv = self.client.get('/search_book/'+self.test_bookid)
         page = rv.data.decode()
         for review in review_list:
-            self.assertTrue(review in page)
+            self.assertTrue(review['productid'] in page)
+            self.assertTrue(review['review'] in page)
 
     def test_get_page_with_reviews_and_pagination(self):
         with freeze_time(dt.now()) as frozen_datetime:
@@ -72,9 +73,11 @@ class ReviewTest(TestUtil):
         rv = self.client.get('/search_book/' + self.test_bookid + '/2')
         page = rv.data.decode()
         for review in first_review_list:
-            self.assertTrue(review in page)
+            self.assertTrue(review['productid'] in page)
+            self.assertTrue(review['review'] in page)
         for review in second_review_list:
-            self.assertFalse(review in page)
+            self.assertFalse(review['review'] in page)
+
 
     def test_add_review(self):
         review_txt = "Jordan is the best player ever"

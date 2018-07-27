@@ -102,7 +102,7 @@ class TestUtil(unittest.TestCase):
                                   review_description="test", review_point=None,
                                   base_id="todhm", base_email="@gmail.com",
                                   created=None):
-        review_description_list = []
+        review_obj_list = []
         review_list = []
         Review.ensure_indexes()
         for i in range(start_num, end_num):
@@ -112,6 +112,14 @@ class TestUtil(unittest.TestCase):
             overall = randint(0, 5) if review_point is None \
                 else review_point
             created = created if created else utc_now_ts()
+            review_obj = dict(
+                userid=test_user_id,
+                productid=product_id,
+                username=test_user_name,
+                review=test_review_description,
+                overall=overall,
+                created=created,
+            )
             review = Review(
                 userid=test_user_id,
                 productid=product_id,
@@ -120,10 +128,10 @@ class TestUtil(unittest.TestCase):
                 overall=overall,
                 created=created,
                 )
-            review_description_list.append(test_review_description)
+            review_obj_list.append(review_obj)
             review_list.append(review)
         Review.objects.insert(review_list)
-        return review_description_list
+        return review_obj_list
 
     def return_random_title_and_reviews(self,
                                         start_num=0, end_num=100,
@@ -186,6 +194,7 @@ class TestUtil(unittest.TestCase):
                                           base_bookname="test",
                                           base_description="test_description",
                                           imageUrl="/src/test/test",
+                                          with_int_id=False,
                                           ):
         product_list = []
         return_product_list = []
@@ -198,20 +207,38 @@ class TestUtil(unittest.TestCase):
             book_name = base_bookname + book_id
             description = base_description + book_id
             price = randint(100, 100000)
-            product_obj = dict(
-                asin=book_id,
-                title=book_name,
-                description=description,
-                price=price,
-                imageUrl=imageUrl,
-            )
-            product = Product(
-                asin=book_id,
-                title=book_name,
-                description=description,
-                price=price,
-                imageUrl=imageUrl,
+            if with_int_id:
+                product_obj = dict(
+                    asin=book_id,
+                    productIntId=i,
+                    title=book_name,
+                    description=description,
+                    price=price,
+                    imageUrl=imageUrl,
                 )
+                product = Product(
+                    asin=book_id,
+                    productIntId=i,
+                    title=book_name,
+                    description=description,
+                    price=price,
+                    imageUrl=imageUrl,
+                    )
+            else:
+                product_obj = dict(
+                    asin=book_id,
+                    title=book_name,
+                    description=description,
+                    price=price,
+                    imageUrl=imageUrl,
+                )
+                product = Product(
+                    asin=book_id,
+                    title=book_name,
+                    description=description,
+                    price=price,
+                    imageUrl=imageUrl,
+                    )
             return_product_list.append(product_obj)
             product_list.append(product)
 
@@ -219,20 +246,42 @@ class TestUtil(unittest.TestCase):
                 test_user_id = base_id + str(x) + base_email
                 overall = randint(0, 5) if review_point is None\
                     else review_point
-                review = Review(
-                    userid=test_user_id,
-                    productid=book_id,
-                    username="test",
-                    review="good",
-                    overall=overall
-                )
-                review_obj = dict(
-                    userid=test_user_id,
-                    productid=book_id,
-                    username="test",
-                    review="good",
-                    overall=overall
-                )
+
+                if with_int_id:
+                    review = Review(
+                        userid=test_user_id,
+                        reviewerIntId=x,
+                        productIntId=i,
+                        productid=book_id,
+                        username="test",
+                        review="good",
+                        overall=overall
+                    )
+                    review_obj = dict(
+                        userid=test_user_id,
+                        reviewerIntId=x,
+                        productIntId=i,
+                        productid=book_id,
+                        username="test",
+                        review="good",
+                        overall=overall
+                    )
+
+                else:
+                    review = Review(
+                        userid=test_user_id,
+                        productid=book_id,
+                        username="test",
+                        review="good",
+                        overall=overall
+                    )
+                    review_obj = dict(
+                        userid=test_user_id,
+                        productid=book_id,
+                        username="test",
+                        review="good",
+                        overall=overall
+                    )
                 return_review_list.append(review_obj)
                 review_list.append(review)
 
@@ -291,19 +340,20 @@ class TestUtil(unittest.TestCase):
         now_time = utc_now_ts()
         for x in range(start_num, end_num):
             for y in range(start_num, end_num):
-                similarity_point = uniform(0, 1)
-                similarity_dict = dict(
-                    productid=str(x),
-                    product_match=str(y),
-                    similarity=similarity_point
-                )
-                similarity = SimilarityTable(
-                    productid=str(x),
-                    product_match=str(y),
-                    similarity=similarity_point
-                )
-                similarity_table_list.append(similarity)
-                similarity_list.append(similarity_dict)
+                if x != y:
+                    similarity_point = uniform(0, 1)
+                    similarity_dict = dict(
+                        productid=str(x),
+                        product_match=str(y),
+                        similarity=similarity_point
+                    )
+                    similarity = SimilarityTable(
+                        productid=str(x),
+                        product_match=str(y),
+                        similarity=similarity_point
+                    )
+                    similarity_table_list.append(similarity)
+                    similarity_list.append(similarity_dict)
         SimilarityTable.objects.insert(similarity_table_list)
         return similarity_list
 

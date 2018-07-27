@@ -47,6 +47,12 @@ def homepage():
         similar_products = Product\
             .objects\
             .filter(asin__in=product_id_list)
+        for product in similar_products:
+            product.cnt = Review.objects.filter(productid=product.asin).count()
+            product.avgOverall = Review\
+                .objects\
+                .filter(productid=product.asin)\
+                .average('overall')
     else:
         last_product = None
         similar_products = None
@@ -62,6 +68,12 @@ def homepage():
         recommend_products = Product\
             .objects\
             .filter(productIntId__in=product_id_lst)
+        for product in recommend_products:
+            product.cnt = Review.objects.filter(productid=product.asin).count()
+            product.avgOverall = Review\
+                .objects\
+                .filter(productid=product.asin)\
+                .average('overall')
     else:
         recommend_products = None
     return render_template(

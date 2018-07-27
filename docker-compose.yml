@@ -72,16 +72,18 @@ services:
 
 
   mongos1:
+    container_name: mongo
     image: mongo:3.4
     restart: always
     volumes:
       - db-data:/data/db
-      - ./mongo/sample_shoppings:/docker-entrypoint-initdb.d/sample_shoppings
+      - ./mongo/shoppings:/docker-entrypoint-initdb.d/shoppings
       - ./mongo/restore.sh:/docker-entrypoint-initdb.d/restore.sh
     networks:
       - sparknetwork
 
   redis:
+    container_name: redis
     image: redis:alpine
     networks:
         - sparknetwork

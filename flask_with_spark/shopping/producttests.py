@@ -7,6 +7,7 @@ from user.models import User
 from shopping.models import *
 from utilities.testutil import TestUtil
 from utilities.errors import NO_QUERY_ERROR, NO_RESULT_FOUND
+from bs4 import BeautifulSoup
 from freezegun import freeze_time
 from datetime import datetime as dt
 from datetime import timedelta
@@ -56,9 +57,11 @@ class ProductTest(TestUtil):
 
     # If similarity table prepared and user registered reviews
     def test_index_page_similarity(self):
-        added_book_lst = self.return_added_book_lst(
+        book_lst, review_lst = self.return_random_product_and_reviews(
             start_num=0,
             end_num=100,
+            base_book_id="",
+            review_point=3,
         )
         review = "Jordan is the best player ever"
         rv = self.client.post(
@@ -83,6 +86,17 @@ class ProductTest(TestUtil):
             key=lambda x: x['similarity']
         )[:10]
         page = rv.data.decode()
+        # Check review count and review overall maded properly.
+        soup = BeautifulSoup(page, "html.parser")
+        rating_star_list = soup.find_all("input", class_='rating-loading')
+        self.assertTrue(len(rating_star_list) == 10)
+        for rating_star in rating_star_list:
+            self.assertTrue(int(rating_star['value']) == 3)
+        review_count_list = soup.find_all("h6", class_='review-count')
+        for review_count in review_count_list:
+            self.assertTrue("10" in review_count.text)
+
+        # Check product title in review list
         for similarity in sorted_similarity:
             product = Product\
                 .objects\
@@ -121,18 +135,31 @@ class ProductTest(TestUtil):
 
     # if recommendation table is prepared recommend list is on the table
     def test_index_page_with_recommendation(self):
-        book_obj_list = self.return_added_book_lst(
+        book_obj_lst, review_lst = self.return_random_product_and_reviews(
             start_num=0,
             end_num=10,
+            base_book_id="",
+            review_point=3,
+            with_int_id=True,
         )
-        book_id_lst = [book['productIntId'] for book in book_obj_list]
+        book_id_lst = [book['productIntId'] for book in book_obj_lst]
         similarity_table_list = self.add_recommendation_table(
             userid=self.test_userIntId,
             product_list=book_id_lst,
         )
         rv = self.client.get('/')
         page = rv.data.decode('utf-8')
-        for book_obj in book_obj_list:
+
+        # Check review count and review overall maded properly.
+        soup = BeautifulSoup(page, "html.parser")
+        rating_star_list = soup.find_all("input", class_='rating-loading')
+        self.assertTrue(len(rating_star_list) == 10)
+        for rating_star in rating_star_list:
+            self.assertTrue(int(rating_star['value']) == 3)
+        review_count_list = soup.find_all("h6", class_='review-count')
+        for review_count in review_count_list:
+            self.assertTrue("10" in review_count.text)
+        for book_obj in book_obj_lst:
             self.assertTrue(book_obj['title'] in page)
 
     # if made recommendation many time get latest recommendation

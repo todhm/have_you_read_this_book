@@ -32,10 +32,10 @@ class BaseConfig:
 
 class DevelopmentConfig(BaseConfig):
     MONGODB_SETTINGS = {
-            'host': 'mongodb://mongos1/sample_shoppings'
+            'host': 'mongodb://mongos1/shoppings'
         }
     # MONGO_URIS
-    MONGO_URI = 'mongodb://mongos1/sample_shoppings'
+    MONGO_URI = 'mongodb://mongos1/shoppings'
     SPARK_DRIVER_MEMORY = "1g"
     SPARK_EXECUTOR_MEMORY = "1g"
 
