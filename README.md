@@ -47,21 +47,32 @@ docker node update --label-add mongos2=true prod-mongos-2
   ```
 
 ## Platform composition
+
 * Webapplication built by **Flask** frameworks.
  * **Standalone Spark Cluster** have been used to handle and extract useful data from databases and utilize in webapp.
+ 
 * Handle async and scheduler job with **Celery Beat** and **Celery Worker**.
+
 * Compose **MongoDB** Cluster to form a high-available and scalable db  to fully utilize big data.
+
  <img src="./photos/diagram.png" alt="Drawing" style="height: 500px;"/>
+ 
 ## Platform main functions
 
 * This platform offer 3 main ways to recommend books to you.
-  * Book recieved best reviews from users.
+
+   * Book recieved best reviews from users.
   <img src="./photos/bestbooks.png" alt="Drawing" style="height: 500px;"/>
-  * Most close book that recieved most similar review point to last review based on cosine similarity
+  
+   * Most close book that recieved most similar review point to last review based on cosine similarity
+   
   <img src="./photos/similarbooks.png" alt="Drawing" style="height: 500px;"/>
-  * Recommended books with [collaborative filtering](https://spark.apache.org/docs/latest/ml-collaborative-filtering.html)
+  
+   * Recommended books with [collaborative filtering](https://spark.apache.org/docs/latest/ml-collaborative-filtering.html)
+   
   <img src="./photos/recommendedbooks.png" alt="Drawing" style="height: 500px;"/>
-* All of this book recommendations are updated automatically with users interactions with this platform. 
+  
+* All of recommendations are updated with user interaction with webapp 
 
 
  ## Running the tests
