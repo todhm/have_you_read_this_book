@@ -30,6 +30,17 @@
     <script src="{{ url_for('static', filename='js/lightgallery/lightgallery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap-star-rating/star-rating.min.js') }}"></script>
+    <script>
+        window.addEventListener( "pageshow", function ( event ) {
+        var historyTraversal = event.persisted ||
+                               ( typeof window.performance != "undefined" &&
+                                    window.performance.navigation.type === 2 );
+        if ( historyTraversal ) {
+          // Handle page restore.
+          window.location.reload();
+        }
+      });
+    </script>
     {% block script %}{% endblock %}
   </body>
 </html>
