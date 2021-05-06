@@ -15,7 +15,7 @@ entrypoints==0.2.3
 Flask==0.12.2
 Flask-Bootstrap==3.3.7.1
 Flask-Celery-Helper==1.1.0
-Flask-Cors==3.0.3
+Flask-Cors==3.0.9
 Flask-Markdown==0.3
 Flask-Migrate==2.1.1
 flask-mongoengine==0.9.5
