@@ -38,7 +38,7 @@ Jinja2==2.10
 jsonschema==2.6.0
 jupyter-core==4.4.0
 kombu==4.1.0
-Mako==1.0.7
+Mako==1.2.2
 Markdown==2.6.11
 MarkupSafe==1.0
 mistune==0.8.1
